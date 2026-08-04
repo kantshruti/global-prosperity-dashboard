@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Global Prosperity Dashboard | 1952-2007</title>
+<script>/* Chart.js v4.4.4 (UMD build), bundled inline so this file has zero external dependencies and works fully offline / behind any firewall or ad-blocker. */
+__CHARTJS_SOURCE__
+</script>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1c2439; --border:#2a3450;
+    --text:#eef1f8; --muted:#93a0bd; --accent:#3ecf8e; --accent2:#5b8def;
+    --Asia:#5b8def; --Europe:#3ecf8e; --Africa:#f2b84b; --Americas:#ef6461; --Oceania:#c084fc;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:radial-gradient(circle at 10% 0%, #131a2b 0%, var(--bg) 45%); color:var(--text);
+    min-height:100vh;
+  }
+  header{ padding:28px 36px 10px; }
+  .eyebrow{ color:var(--accent); font-size:12px; letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+  h1{ margin:6px 0 4px; font-size:28px; font-weight:800; letter-spacing:-0.3px; }
+  .subtitle{ color:var(--muted); font-size:14px; max-width:720px; line-height:1.5; }
+  .badges{ display:flex; gap:8px; flex-wrap:wrap; margin-top:14px; }
+  .badge{ font-size:11px; padding:5px 10px; border-radius:999px; background:var(--panel2); border:1px solid var(--border); color:var(--muted); }
+
+  main{ padding:10px 36px 50px; max-width:1400px; margin:0 auto; }
+
+  .kpi-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin:18px 0 22px; }
+  .kpi-card{ background:linear-gradient(155deg,var(--panel),var(--panel2)); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; position:relative; overflow:hidden; }
+  .kpi-card .label{ color:var(--muted); font-size:12px; text-transform:uppercase; letter-spacing:1px; }
+  .kpi-card .value{ font-size:28px; font-weight:800; margin-top:6px; }
+  .kpi-card .delta{ font-size:12px; margin-top:6px; color:var(--accent); }
+  .kpi-card .delta.neg{ color:var(--Americas); }
+
+  .controls{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:16px 20px; margin-bottom:20px; }
+  .controls .year-block{ display:flex; align-items:center; gap:12px; flex:1; min-width:280px; }
+  #playBtn{ background:var(--accent); color:#08130d; border:none; width:38px; height:38px; border-radius:50%; font-size:15px; cursor:pointer; flex:none; display:flex; align-items:center; justify-content:center; font-weight:700; }
+  #playBtn:hover{ filter:brightness(1.08); }
+  #yearSlider{ flex:1; accent-color:var(--accent); height:4px; }
+  #yearLabel{ font-weight:800; font-size:20px; min-width:56px; text-align:center; }
+  .continent-filters{ display:flex; gap:8px; flex-wrap:wrap; }
+  .chip{ font-size:12px; padding:6px 12px; border-radius:999px; border:1px solid var(--border); cursor:pointer; user-select:none; color:var(--muted); background:var(--panel2); transition:.15s; }
+  .chip.active{ color:#08130d; font-weight:700; border-color:transparent; }
+  .chip[data-c="Asia"].active{ background:var(--Asia); }
+  .chip[data-c="Europe"].active{ background:var(--Europe); }
+  .chip[data-c="Africa"].active{ background:var(--Africa); }
+  .chip[data-c="Americas"].active{ background:var(--Americas); }
+  .chip[data-c="Oceania"].active{ background:var(--Oceania); }
+
+  .grid{ display:grid; grid-template-columns: 1.5fr 1fr; gap:18px; }
+  .panel{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; margin-bottom:18px; }
+  .panel h3{ margin:0 0 4px; font-size:14px; }
+  .panel .hint{ color:var(--muted); font-size:12px; margin-bottom:12px; }
+  .full{ grid-column: 1 / -1; }
+  canvas{ max-width:100%; }
+
+  .table-wrap{ max-height:420px; overflow:auto; border-radius:10px; border:1px solid var(--border); }
+  table{ width:100%; border-collapse:collapse; font-size:13px; }
+  thead th{ position:sticky; top:0; background:var(--panel2); text-align:left; padding:10px 12px; cursor:pointer; color:var(--muted); font-weight:700; border-bottom:1px solid var(--border); white-space:nowrap; }
+  thead th:hover{ color:var(--text); }
+  tbody td{ padding:8px 12px; border-bottom:1px solid rgba(255,255,255,0.04); }
+  tbody tr:hover{ background:rgba(255,255,255,0.03); }
+  .dot{ width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+  #searchBox{ width:100%; padding:9px 12px; border-radius:8px; border:1px solid var(--border); background:var(--panel2); color:var(--text); font-size:13px; margin-bottom:10px; }
+  #searchBox::placeholder{ color:var(--muted); }
+
+  footer{ text-align:center; color:var(--muted); font-size:12px; padding:20px 20px 40px; }
+  footer a{ color:var(--accent2); text-decoration:none; }
+
+  @media (max-width:900px){
+    .kpi-row{ grid-template-columns:repeat(2,1fr); }
+    .grid{ grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Interactive BI Portfolio Project</div>
+  <h1>Global Prosperity Dashboard</h1>
+  <div class="subtitle">55 years of human development across 142 countries (1952–2007) — life expectancy, population and GDP per capita, modeled with SQL and visualized as a live, filterable, animated dashboard. Drag the year slider or hit play to watch the world change.</div>
+  <div class="badges">
+    <span class="badge">SQL (SQLite)</span>
+    <span class="badge">Python / ETL</span>
+    <span class="badge">Data Modeling</span>
+    <span class="badge">Chart.js</span>
+    <span class="badge">Interactive Dashboard Design</span>
+    <span class="badge">Storytelling with Data</span>
+  </div>
+</header>
+
+<main>
+
+  <div class="kpi-row">
+    <div class="kpi-card">
+      <div class="label">Global Population</div>
+      <div class="value" id="kpiPop">-</div>
+      <div class="delta" id="kpiPopDelta"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Avg Life Expectancy</div>
+      <div class="value" id="kpiLife">-</div>
+      <div class="delta" id="kpiLifeDelta"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Avg GDP / Capita</div>
+      <div class="value" id="kpiGdp">-</div>
+      <div class="delta" id="kpiGdpDelta"></div>
+    </div>
+    <div class="kpi-card">
+      <div class="label">Countries Tracked</div>
+      <div class="value" id="kpiCountries">-</div>
+      <div class="delta">population-weighted averages, SQL views</div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="year-block">
+      <button id="playBtn">▶</button>
+      <input type="range" id="yearSlider" min="0" max="11" step="1" value="11">
+      <div id="yearLabel">2007</div>
+    </div>
+    <div class="continent-filters" id="continentFilters"></div>
+  </div>
+
+  <div class="grid">
+    <div class="panel">
+      <h3>Wealth vs. Health — by Country</h3>
+      <div class="hint">Bubble size = population · Color = continent · X axis (log scale) = GDP per capita · Y axis = life expectancy</div>
+      <canvas id="bubbleChart" height="330"></canvas>
+    </div>
+    <div class="panel">
+      <h3>Population Share by Continent</h3>
+      <div class="hint">Selected year: <span id="donutYearLabel"></span></div>
+      <canvas id="donutChart" height="330"></canvas>
+    </div>
+
+    <div class="panel full">
+      <h3>Life Expectancy Trend by Continent</h3>
+      <div class="hint">Population-weighted average life expectancy, 1952–2007</div>
+      <canvas id="trendChart" height="110"></canvas>
+    </div>
+
+    <div class="panel">
+      <h3>Biggest Gains: Life Expectancy</h3>
+      <div class="hint">Years gained, 1952 → 2007 (top 10 countries)</div>
+      <canvas id="gainChart" height="280"></canvas>
+    </div>
+    <div class="panel">
+      <h3>Fastest-Growing Economies</h3>
+      <div class="hint">GDP per capita growth multiple, 1952 → 2007 (top 10)</div>
+      <canvas id="growthChart" height="280"></canvas>
+    </div>
+
+    <div class="panel full">
+      <h3>Country Explorer</h3>
+      <div class="hint">Data for the selected year — search or click a column to sort</div>
+      <input type="text" id="searchBox" placeholder="Search country...">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-key="country">Country</th>
+              <th data-key="continent">Continent</th>
+              <th data-key="life_expectancy">Life Expectancy</th>
+              <th data-key="gdp_per_capita">GDP / Capita</th>
+              <th data-key="population">Population</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Data: Gapminder Foundation (via plotly-express) · Built by Shruti · SQL + Python + JavaScript, no server required ·
+  <a href="https://github.com" target="_blank">View source on GitHub</a>
+</footer>
+
+<script id="dashboard-data" type="application/json">__DASHBOARD_DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById('dashboard-data').textContent);
+const COLORS = {Asia:'#5b8def', Europe:'#3ecf8e', Africa:'#f2b84b', Americas:'#ef6461', Oceania:'#c084fc'};
+const YEARS = DATA.years;
+const CONTINENTS = DATA.continents;
+let activeContinents = new Set(CONTINENTS);
+let currentYearIdx = YEARS.length - 1;
+let playTimer = null;
+
+function fmtNum(n){
+  if(n >= 1e9) return (n/1e9).toFixed(2)+'B';
+  if(n >= 1e6) return (n/1e6).toFixed(1)+'M';
+  if(n >= 1e3) return (n/1e3).toFixed(1)+'K';
+  return Math.round(n);
+}
+function fmtMoney(n){ return '$'+Math.round(n).toLocaleString(); }
+
+// ---------- Continent filter chips ----------
+const filterEl = document.getElementById('continentFilters');
+CONTINENTS.forEach(c=>{
+  const chip = document.createElement('div');
+  chip.className = 'chip active';
+  chip.dataset.c = c;
+  chip.textContent = c;
+  chip.onclick = ()=>{
+    if(activeContinents.has(c)){ activeContinents.delete(c); chip.classList.remove('active'); }
+    else { activeContinents.add(c); chip.classList.add('active'); }
+    renderAll();
+  };
+  filterEl.appendChild(chip);
+});
+
+// ---------- KPI cards ----------
+function renderKPIs(year){
+  const row = DATA.global_kpis_by_year.find(r=>r.year===year);
+  const idx = YEARS.indexOf(year);
+  const prevRow = idx>0 ? DATA.global_kpis_by_year.find(r=>r.year===YEARS[idx-1]) : null;
+  document.getElementById('kpiPop').textContent = fmtNum(row.total_population);
+  document.getElementById('kpiLife').textContent = row.weighted_life_expectancy.toFixed(1)+' yrs';
+  document.getElementById('kpiGdp').textContent = fmtMoney(row.weighted_gdp_per_capita);
+  document.getElementById('kpiCountries').textContent = row.countries_tracked;
+  const popDelta = document.getElementById('kpiPopDelta');
+  const lifeDelta = document.getElementById('kpiLifeDelta');
+  const gdpDelta = document.getElementById('kpiGdpDelta');
+  if(prevRow){
+    popDelta.textContent = '+'+fmtNum(row.total_population-prevRow.total_population)+' vs '+YEARS[idx-1];
+    const ld = (row.weighted_life_expectancy-prevRow.weighted_life_expectancy);
+    lifeDelta.textContent = (ld>=0?'+':'')+ld.toFixed(1)+' yrs vs '+YEARS[idx-1];
+    const gd = (row.weighted_gdp_per_capita-prevRow.weighted_gdp_per_capita);
+    gdpDelta.textContent = (gd>=0?'+':'')+fmtMoney(gd)+' vs '+YEARS[idx-1];
+  } else {
+    popDelta.textContent = 'baseline year';
+    lifeDelta.textContent = 'baseline year';
+    gdpDelta.textContent = 'baseline year';
+  }
+}
+
+// ---------- Bubble chart ----------
+const bubbleCtx = document.getElementById('bubbleChart');
+let bubbleChart = new Chart(bubbleCtx, {
+  type: 'bubble',
+  data: { datasets: [] },
+  options: {
+    responsive:true,
+    animation:{ duration:400 },
+    plugins:{
+      legend:{ labels:{ color:'#93a0bd' } },
+      tooltip:{ callbacks:{ label:(ctx)=>{
+        const p = ctx.raw;
+        return `${p.country}: ${p.y.toFixed(1)} yrs, ${fmtMoney(p.x)}, pop ${fmtNum(p.pop)}`;
+      }}}
+    },
+    scales:{
+      x:{ type:'logarithmic', title:{ display:true, text:'GDP per Capita (log scale, USD)', color:'#93a0bd' }, ticks:{ color:'#93a0bd' }, grid:{ color:'rgba(255,255,255,0.05)' } },
+      y:{ title:{ display:true, text:'Life Expectancy (years)', color:'#93a0bd' }, min:20, max:90, ticks:{ color:'#93a0bd' }, grid:{ color:'rgba(255,255,255,0.05)' } }
+    }
+  }
+});
+
+function renderBubble(year){
+  const rows = DATA.records.filter(r=>r.year===year && activeContinents.has(r.continent));
+  const byContinent = {};
+  rows.forEach(r=>{
+    byContinent[r.continent] = byContinent[r.continent] || [];
+    byContinent[r.continent].push({ x:r.gdp_per_capita, y:r.life_expectancy, r:Math.max(4,Math.sqrt(r.population)/900), pop:r.population, country:r.country });
+  });
+  bubbleChart.data.datasets = Object.keys(byContinent).map(c=>({
+    label:c, data:byContinent[c], backgroundColor: COLORS[c]+'cc', borderColor: COLORS[c], borderWidth:1
+  }));
+  bubbleChart.update();
+}
+
+// ---------- Donut chart ----------
+const donutCtx = document.getElementById('donutChart');
+let donutChart = new Chart(donutCtx, {
+  type:'doughnut',
+  data:{ labels:[], datasets:[{ data:[], backgroundColor:[] }] },
+  options:{ plugins:{ legend:{ position:'bottom', labels:{ color:'#93a0bd', boxWidth:10 } } } }
+});
+function renderDonut(year){
+  const rows = DATA.records.filter(r=>r.year===year && activeContinents.has(r.continent));
+  const totals = {};
+  rows.forEach(r=>{ totals[r.continent] = (totals[r.continent]||0) + r.population; });
+  const labels = Object.keys(totals);
+  donutChart.data.labels = labels;
+  donutChart.data.datasets[0].data = labels.map(l=>totals[l]);
+  donutChart.data.datasets[0].backgroundColor = labels.map(l=>COLORS[l]);
+  donutChart.update();
+  document.getElementById('donutYearLabel').textContent = year;
+}
+
+// ---------- Trend chart (continent life expectancy over time) ----------
+const trendCtx = document.getElementById('trendChart');
+let trendChart = new Chart(trendCtx, {
+  type:'line',
+  data:{ labels:YEARS, datasets: CONTINENTS.map(c=>({
+    label:c,
+    data: YEARS.map(y=>{
+      const row = DATA.continent_trends.find(r=>r.continent===c && r.year===y);
+      return row ? row.weighted_life_expectancy : null;
+    }),
+    borderColor: COLORS[c], backgroundColor: COLORS[c]+'33', tension:0.35, pointRadius:2
+  })) },
+  options:{
+    plugins:{ legend:{ labels:{ color:'#93a0bd' } } },
+    scales:{
+      x:{ ticks:{ color:'#93a0bd' }, grid:{ color:'rgba(255,255,255,0.04)' } },
+      y:{ ticks:{ color:'#93a0bd' }, grid:{ color:'rgba(255,255,255,0.06)' } }
+    }
+  }
+});
+function renderTrend(){
+  trendChart.data.datasets.forEach(ds=>{ ds.hidden = !activeContinents.has(ds.label); });
+  trendChart.update();
+}
+
+// ---------- Gain / Growth bar charts (static, top 10 overall) ----------
+const gainCtx = document.getElementById('gainChart');
+new Chart(gainCtx, {
+  type:'bar',
+  data:{
+    labels: DATA.top_life_expectancy_gain.map(r=>r.country),
+    datasets:[{ data: DATA.top_life_expectancy_gain.map(r=>r.gain_years),
+      backgroundColor: DATA.top_life_expectancy_gain.map(r=>COLORS[r.continent]) }]
+  },
+  options:{ indexAxis:'y', plugins:{ legend:{ display:false } },
+    scales:{ x:{ ticks:{ color:'#93a0bd' }, grid:{ color:'rgba(255,255,255,0.05)' } }, y:{ ticks:{ color:'#93a0bd' }, grid:{ display:false } } } }
+});
+
+const growthCtx = document.getElementById('growthChart');
+new Chart(growthCtx, {
+  type:'bar',
+  data:{
+    labels: DATA.top_gdp_growth.map(r=>r.country),
+    datasets:[{ data: DATA.top_gdp_growth.map(r=>r.growth_multiple),
+      backgroundColor: DATA.top_gdp_growth.map(r=>COLORS[r.continent]) }]
+  },
+  options:{ indexAxis:'y', plugins:{ legend:{ display:false } },
+    scales:{ x:{ ticks:{ color:'#93a0bd' }, grid:{ color:'rgba(255,255,255,0.05)' } }, y:{ ticks:{ color:'#93a0bd' }, grid:{ display:false } } } }
+});
+
+// ---------- Table ----------
+let sortKey = 'population', sortDir = -1;
+function renderTable(year){
+  const q = document.getElementById('searchBox').value.trim().toLowerCase();
+  let rows = DATA.records.filter(r=>r.year===year && activeContinents.has(r.continent));
+  if(q) rows = rows.filter(r=>r.country.toLowerCase().includes(q));
+  rows = rows.slice().sort((a,b)=> (a[sortKey]>b[sortKey]?1:-1)*sortDir);
+  const body = document.getElementById('tableBody');
+  body.innerHTML = rows.map(r=>`
+    <tr>
+      <td><span class="dot" style="background:${COLORS[r.continent]}"></span>${r.country}</td>
+      <td>${r.continent}</td>
+      <td>${r.life_expectancy.toFixed(1)}</td>
+      <td>${fmtMoney(r.gdp_per_capita)}</td>
+      <td>${fmtNum(r.population)}</td>
+    </tr>`).join('');
+}
+document.querySelectorAll('th[data-key]').forEach(th=>{
+  th.onclick = ()=>{
+    const key = th.dataset.key;
+    if(sortKey===key) sortDir *= -1; else { sortKey=key; sortDir=-1; }
+    renderTable(YEARS[currentYearIdx]);
+  };
+});
+document.getElementById('searchBox').addEventListener('input', ()=>renderTable(YEARS[currentYearIdx]));
+
+// ---------- Master render / year controls ----------
+function renderAll(){
+  const year = YEARS[currentYearIdx];
+  document.getElementById('yearLabel').textContent = year;
+  renderKPIs(year);
+  renderBubble(year);
+  renderDonut(year);
+  renderTrend();
+  renderTable(year);
+}
+const slider = document.getElementById('yearSlider');
+slider.max = YEARS.length - 1;
+slider.value = currentYearIdx;
+slider.addEventListener('input', ()=>{
+  currentYearIdx = parseInt(slider.value);
+  renderAll();
+});
+
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', ()=>{
+  if(playTimer){
+    clearInterval(playTimer); playTimer = null; playBtn.textContent = '▶';
+    return;
+  }
+  playBtn.textContent = '❚❚';
+  playTimer = setInterval(()=>{
+    currentYearIdx = (currentYearIdx + 1) % YEARS.length;
+    slider.value = currentYearIdx;
+    renderAll();
+    if(currentYearIdx === YEARS.length - 1){
+      clearInterval(playTimer); playTimer = null; playBtn.textContent = '▶';
+    }
+  }, 900);
+});
+
+renderAll();
+</script>
+</body>
+</html>
